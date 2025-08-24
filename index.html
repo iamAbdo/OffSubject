@@ -1,83 +1,150 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>خارج الموضوع - لعبة</title>
   <style>
-    body {
-      font-family: "Tahoma", sans-serif;
-      text-align: center;
-      background: #f8f9fa;
-      margin: 0;
-      padding: 20px;
+    /* mobile-friendly layout */
+    :root { --primary: #0b84ff; --accent: #0a66d1; --bg: #f3f6fb; }
+    html,body { height:100%; margin:0; font-family: "Tahoma", sans-serif; background:var(--bg); -webkit-tap-highlight-color: transparent; }
+    .hidden { display: none !important; } /* <-- fixes the "start does nothing" bug */
+    .wrap {
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:4vw;
+      box-sizing:border-box;
     }
-    h1 {
-      color: #333;
+
+    h1 { font-size:6.5vw; margin:0 0 4vh 0; }
+    .card-area { width:100%; max-width:520px; text-align:center; }
+
+    .big-card {
+      background:white;
+      border-radius:18px;
+      padding:6vh 4vw;
+      box-shadow:0 8px 24px rgba(10,10,20,0.08);
+      min-height:22vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:7vw;
+      line-height:1.15;
+      direction:rtl;
+      margin-bottom:4vh;
+      border: 1px solid rgba(0,0,0,0.06);
+      word-break: break-word;
     }
-    .hidden {
-      display: none;
+
+    .controls {
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:3vh;
+      align-items:center;
     }
-    button {
-      font-size: 20px;
-      padding: 15px 30px;
-      margin: 15px;
-      border: none;
-      border-radius: 12px;
-      background: #007bff;
-      color: white;
-      cursor: pointer;
+
+    input[type="number"] {
+      font-size:6.5vw;
+      padding:2.5vh 3vw;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,0.12);
+      width:45%;
+      text-align:center;
     }
-    button:hover {
-      background: #0056b3;
+
+    .btn {
+      width:100%;
+      max-width:520px;
+      background: linear-gradient(180deg,var(--primary),var(--accent));
+      color:white;
+      border:none;
+      border-radius:16px;
+      padding:3.2vh 3vw;
+      font-size:7vw;
+      box-shadow:0 8px 24px rgba(11,132,255,0.18);
+      cursor:pointer;
+      touch-action:manipulation;
     }
-    #card {
-      font-size: 30px;
-      margin-top: 40px;
-      padding: 40px;
-      border: 2px solid #444;
-      border-radius: 20px;
-      background: white;
-      min-height: 120px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    .btn:active { transform:scale(0.99); }
+
+    .small-note { font-size:3.8vw; color:#666; margin-top:2vh; }
+
+    /* final screen */
+    .final-screen {
+      display:flex;
+      flex-direction:column;
+      gap:2vh;
+      align-items:center;
     }
+    .muted { color:#777; font-size:4.2vw; }
   </style>
 </head>
 <body>
-  <h1>🎲 لعبة خارج الموضوع</h1>
+  <div class="wrap">
+    <h1>🎲 خارج الموضوع</h1>
 
-  <div id="setup">
-    <label for="players">عدد اللاعبين:</label>
-    <input type="number" id="players" min="3" max="15" value="5">
-    <br>
-    <button onclick="startGame()">ابدأ اللعبة</button>
-  </div>
+    <div id="setup" class="card-area">
+      <div class="big-card" style="font-size:5.5vw;min-height:16vh;">
+        حدد عدد اللاعبين ثم إضغط ابدأ — مرر الهاتف بعد كل كشف
+      </div>
+      <div class="controls">
+        <input id="players" type="number" min="3" max="15" value="5" inputmode="numeric" />
+        <button class="btn" onclick="startGame()">ابدأ اللعبة</button>
+        <div class="small-note">أدخل عدد 3–15. كل جولة يكشف لاعب واحد ثم يمرر الهاتف.</div>
+      </div>
+    </div>
 
-  <div id="game" class="hidden">
-    <h2>الدور رقم <span id="turn">1</span></h2>
-    <div id="card">إضغط لعرض الكلمة</div>
-    <button onclick="reveal()">عرض / إخفاء</button>
-    <button onclick="nextPlayer()">تم - مرر الهاتف</button>
+    <div id="game" class="card-area hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:2vh;">
+        <div style="font-size:4.5vw;">الدور رقم</div>
+        <div id="turn" style="font-size:5.5vw;font-weight:700;">1</div>
+      </div>
+
+      <div id="card" class="big-card">إضغط الزر لبدء الكشف</div>
+
+      <div class="controls">
+        <button id="actionBtn" class="btn" onclick="nextAction()">اكشف</button>
+      </div>
+    </div>
+
+    <div id="end" class="card-area hidden">
+      <div class="big-card" style="font-size:6.5vw;min-height:18vh;">
+        انتهت الأدوار!
+      </div>
+      <div class="final-screen">
+        <div class="muted">الموضوع كان:</div>
+        <div id="finalSubject" style="font-size:6.5vw;font-weight:700"></div>
+        <div class="muted">لاعب/ـة خارج الموضوع: <span id="finalOff" style="font-weight:700"></span></div>
+        <button class="btn" onclick="restart()">ابدأ مرة أخرى</button>
+      </div>
+    </div>
   </div>
 
   <script>
     const subjects = [
-      "كرة القدم", "الشناوة", "الكُسكُسي", "البازين", "البوراك",
-      "الحريرة", "شوربة فريك", "القهوة", "الشاي بالنعناع", "الزليخة",
-      "العصيدة", "المقروط", "المشبك", "الزلابية", "سوق الجمعة",
-      "القصبة", "سطاوالي", "وهران", "قسنطينة", "تيزي وزو",
-      "الصحراء", "الهقار", "تمنراست", "عنابة", "بجاية",
-      "الحراش", "المولودية", "شبيبة القبائل", "إتحاد العاصمة",
-      "الراي", "الشعبي", "المالوف", "الغناوي", "الديوان",
-      "الزيتون", "التمر", "الكليمانتين", "المشمش", "البطاطا",
-      "البريك", "الكسكروط", "الهريسة", "الطاجين", "المحاجب",
-      "الكسرة", "الملوي", "البغرير", "البوراك", "اللحم المشوي",
-      "الحمص", "الفول", "اللوبيا", "السردين", "السمك المشوي",
-      "رمضان", "العيد الكبير", "العيد الصغير", "المولد النبوي",
-      "الخطوبة", "العرس", "العقيقة", "الختان", "الجامعة",
-      "البحر", "الملعب", "المقهى", "الدار", "الشارع",
-      "التاكسي", "الترامواي", "الميترو", "الحافلة", "المطار"
+      /* expanded Algerian-Arabic subject list (mix of dialectal words & places/food/culture) */
+      "كرة القدم", "الشناوة", "الكُسكُسي", "البوراك", "البريك", "الطاجين",
+      "الشخشوخة", "المحاجب", "المقروض", "الزلابية", "الشمندر", "الزريجة",
+      "القهوة بالمعلقة", "الشاي بالنعناع", "الحريرة", "الملوخية",
+      "الكسرة", "الملوي", "البغرير", "الجِلبان", "الحمص", "الفول",
+      "المسمن", "القمرة", "التمر", "الزيتون", "المشمش", "الكليمنتين",
+      "شباك الطاكسي", "الترامواي", "الميترو", "الطريق السريعة", "القصبة",
+      "سوق الجمعة", "قسنطينة", "وهران", "تمنراست", "عنابة", "بجاية",
+      "تيزي وزو", "الحراش", "العيّاشة", "السوّاق", "الملعب", "المقهى",
+      "أم كلثوم (الطرب)", "الراي", "المالوف", "الشيخ", "الديوانة",
+      "العرس", "الخطوبة", "العقيقة", "الختان", "رمضان", "العيد الكبير",
+      "العيد الصغير", "السحور", "الإفطار", "الشهاب", "النجمة", "الصحراء",
+      "الهقار", "الكثبان", "الواحة", "البحر", "السمك المشوي", "السردين",
+      "اللحم المشوي", "الكسكروط", "البطاطا مقلية", "المطبخ تاعي", "الباركينغ",
+      "الشرطة", "الطبيب", "المدرسة", "الجامعة", "الموظف", "المقهى الشعبي",
+      "لودج", "البيضة", "الساعة", "الهاتف", "الشبكة", "البطارية",
+      "النهار", "الليل", "المنطقة الصناعية", "الشاطئ", "الحديقة", "الشارع الرئيسي",
+      "الراتب", "المشروع", "الهواية", "القراءة", "السباحة", "الغيتار",
+      "البيانو", "الرسم", "السينما", "المسلسل", "الأنمي", "الكوميديا"
     ];
 
     let players = 0;
@@ -87,42 +154,74 @@
     let revealed = false;
 
     function startGame() {
-      players = parseInt(document.getElementById("players").value);
+      const raw = parseInt(document.getElementById("players").value, 10);
+      // validation & fallback
+      if (isNaN(raw) || raw < 3) {
+        players = 5;
+      } else if (raw > 15) {
+        players = 15;
+      } else {
+        players = raw;
+      }
+
+      // choose subject and pick one player to be "off subject"
       subject = subjects[Math.floor(Math.random() * subjects.length)];
-      offSubject = Math.floor(Math.random() * players) + 1; // pick 1 off subject
+      offSubject = Math.floor(Math.random() * players) + 1; // 1..players
+
       currentPlayer = 1;
       revealed = false;
 
+      // show/hide panels
       document.getElementById("setup").classList.add("hidden");
+      document.getElementById("end").classList.add("hidden");
       document.getElementById("game").classList.remove("hidden");
+
       document.getElementById("turn").textContent = currentPlayer;
-      document.getElementById("card").textContent = "إضغط لعرض الكلمة";
+      document.getElementById("card").textContent = "إضغط الزر لبدء الكشف";
+      document.getElementById("actionBtn").textContent = "اكشف";
+
+      // small accessibility: focus button for faster tapping
+      document.getElementById("actionBtn").focus();
     }
 
-    function reveal() {
+    function nextAction() {
+      const card = document.getElementById("card");
+      const btn = document.getElementById("actionBtn");
+
       if (!revealed) {
+        // Reveal role for current player
         if (currentPlayer === offSubject) {
-          document.getElementById("card").textContent = "❌ خارج الموضوع";
+          card.textContent = "❌ خارج الموضوع";
         } else {
-          document.getElementById("card").textContent = "✅ الموضوع: " + subject;
+          // show subject (short label)
+          card.textContent = "✅ الموضوع: " + subject;
         }
+        btn.textContent = "التالي";
         revealed = true;
       } else {
-        document.getElementById("card").textContent = "إضغط لعرض الكلمة";
-        revealed = false;
+        // Move to next player or finish
+        if (currentPlayer < players) {
+          currentPlayer++;
+          document.getElementById("turn").textContent = currentPlayer;
+          card.textContent = "إضغط الزر للكشف";
+          btn.textContent = "اكشف";
+          revealed = false;
+        } else {
+          // finished all players — show final screen with summary
+          document.getElementById("game").classList.add("hidden");
+          document.getElementById("end").classList.remove("hidden");
+
+          document.getElementById("finalSubject").textContent = subject;
+          document.getElementById("finalOff").textContent = offSubject + " / " + players;
+        }
       }
     }
 
-    function nextPlayer() {
-      if (currentPlayer < players) {
-        currentPlayer++;
-        document.getElementById("turn").textContent = currentPlayer;
-        document.getElementById("card").textContent = "إضغط لعرض الكلمة";
-        revealed = false;
-      } else {
-        alert("🎉 انتهت الأدوار! ناقشوا واكتشفوا من هو خارج الموضوع.");
-        location.reload(); // restart
-      }
+    function restart() {
+      // simple restart: go back to setup
+      document.getElementById("end").classList.add("hidden");
+      document.getElementById("game").classList.add("hidden");
+      document.getElementById("setup").classList.remove("hidden");
     }
   </script>
 </body>
