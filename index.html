@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>خارج الموضوع - لعبة</title>
+  <style>
+    body {
+      font-family: "Tahoma", sans-serif;
+      text-align: center;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    .hidden {
+      display: none;
+    }
+    button {
+      font-size: 20px;
+      padding: 15px 30px;
+      margin: 15px;
+      border: none;
+      border-radius: 12px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    #card {
+      font-size: 30px;
+      margin-top: 40px;
+      padding: 40px;
+      border: 2px solid #444;
+      border-radius: 20px;
+      background: white;
+      min-height: 120px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎲 لعبة خارج الموضوع</h1>
+
+  <div id="setup">
+    <label for="players">عدد اللاعبين:</label>
+    <input type="number" id="players" min="3" max="15" value="5">
+    <br>
+    <button onclick="startGame()">ابدأ اللعبة</button>
+  </div>
+
+  <div id="game" class="hidden">
+    <h2>الدور رقم <span id="turn">1</span></h2>
+    <div id="card">إضغط لعرض الكلمة</div>
+    <button onclick="reveal()">عرض / إخفاء</button>
+    <button onclick="nextPlayer()">تم - مرر الهاتف</button>
+  </div>
+
+  <script>
+    const subjects = [
+      "كرة القدم", "الشناوة", "الكُسكُسي", "البازين", "البوراك",
+      "الحريرة", "شوربة فريك", "القهوة", "الشاي بالنعناع", "الزليخة",
+      "العصيدة", "المقروط", "المشبك", "الزلابية", "سوق الجمعة",
+      "القصبة", "سطاوالي", "وهران", "قسنطينة", "تيزي وزو",
+      "الصحراء", "الهقار", "تمنراست", "عنابة", "بجاية",
+      "الحراش", "المولودية", "شبيبة القبائل", "إتحاد العاصمة",
+      "الراي", "الشعبي", "المالوف", "الغناوي", "الديوان",
+      "الزيتون", "التمر", "الكليمانتين", "المشمش", "البطاطا",
+      "البريك", "الكسكروط", "الهريسة", "الطاجين", "المحاجب",
+      "الكسرة", "الملوي", "البغرير", "البوراك", "اللحم المشوي",
+      "الحمص", "الفول", "اللوبيا", "السردين", "السمك المشوي",
+      "رمضان", "العيد الكبير", "العيد الصغير", "المولد النبوي",
+      "الخطوبة", "العرس", "العقيقة", "الختان", "الجامعة",
+      "البحر", "الملعب", "المقهى", "الدار", "الشارع",
+      "التاكسي", "الترامواي", "الميترو", "الحافلة", "المطار"
+    ];
+
+    let players = 0;
+    let currentPlayer = 1;
+    let subject = "";
+    let offSubject = 0;
+    let revealed = false;
+
+    function startGame() {
+      players = parseInt(document.getElementById("players").value);
+      subject = subjects[Math.floor(Math.random() * subjects.length)];
+      offSubject = Math.floor(Math.random() * players) + 1; // pick 1 off subject
+      currentPlayer = 1;
+      revealed = false;
+
+      document.getElementById("setup").classList.add("hidden");
+      document.getElementById("game").classList.remove("hidden");
+      document.getElementById("turn").textContent = currentPlayer;
+      document.getElementById("card").textContent = "إضغط لعرض الكلمة";
+    }
+
+    function reveal() {
+      if (!revealed) {
+        if (currentPlayer === offSubject) {
+          document.getElementById("card").textContent = "❌ خارج الموضوع";
+        } else {
+          document.getElementById("card").textContent = "✅ الموضوع: " + subject;
+        }
+        revealed = true;
+      } else {
+        document.getElementById("card").textContent = "إضغط لعرض الكلمة";
+        revealed = false;
+      }
+    }
+
+    function nextPlayer() {
+      if (currentPlayer < players) {
+        currentPlayer++;
+        document.getElementById("turn").textContent = currentPlayer;
+        document.getElementById("card").textContent = "إضغط لعرض الكلمة";
+        revealed = false;
+      } else {
+        alert("🎉 انتهت الأدوار! ناقشوا واكتشفوا من هو خارج الموضوع.");
+        location.reload(); // restart
+      }
+    }
+  </script>
+</body>
+</html>
